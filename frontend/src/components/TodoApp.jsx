@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import API from './api'; // Axios instance we defined earlier
+import API from '../api'; // Axios instance we defined earlier
 
 function TodoApp() {
   const [todos, setTodos] = useState([]);
