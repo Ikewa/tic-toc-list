@@ -7,7 +7,6 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    working-directory: backend 
 
     steps:
       - name: Checkout code
@@ -16,13 +15,28 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: 18
 
-      - name: Install dependencies
+      - name: Install backend dependencies
+        working-directory: backend
         run: npm install
 
-      - name: Run linter
-        run: npm run lint || echo "No linter defined yet"
+      - name: Run backend linter
+        working-directory: backend
+        run: npm run lint || echo "No backend lint script yet"
 
-      - name: Run tests
-        run: npm test -- --watchAll=false
+      - name: Run backend tests
+        working-directory: backend
+        run: npm test
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Run frontend linter
+        working-directory: frontend
+        run: npm run lint || echo "No frontend lint script yet"
+
+      - name: Run frontend tests
+        working-directory: frontend
+        run: npm test
