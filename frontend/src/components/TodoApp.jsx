@@ -1,60 +1,73 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import API from './api'; // Axios instance we defined earlier
 
-export default function TodoApp() {
-  const [task, setTask] = useState('');
-  const [datetime, setDatetime] = useState('');
+function TodoApp() {
   const [todos, setTodos] = useState([]);
+  const [text, setText] = useState('');
+  const [time, setTime] = useState('');
 
-  const addTodo = () => {
-    if (task && datetime) {
-      const newTodo = {
-        id: Date.now(),
-        text: task,
-        time: datetime
-      };
-      setTodos([newTodo, ...todos]);
-      setTask('');
-      setDatetime('');
+  // Fetch todos on load
+  useEffect(() => {
+    fetchTodos();
+  }, []);
+
+  const fetchTodos = async () => {
+    try {
+      const res = await API.get('/todos');
+      setTodos(res.data);
+    } catch (err) {
+      console.error('Failed to load todos:', err);
     }
   };
 
-  const deleteTodo = (id) => {
-    setTodos(todos.filter(todo => todo.id !== id));
+  const handleAdd = async () => {
+    if (!text || !time) return alert('Please fill in all fields');
+    try {
+      await API.post('/todos', { text, time });
+      fetchTodos(); // Refresh list
+      setText('');
+      setTime('');
+    } catch (err) {
+      console.error('Error adding todo:', err);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await API.delete(`/todos/${id}`);
+      fetchTodos(); // Refresh list
+    } catch (err) {
+      console.error('Error deleting todo:', err);
+    }
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto text-center">
-      <h1 className="text-2xl font-bold mb-4">To-Do List</h1>
+    <div>
+      <h2>📝 To-Do List</h2>
+
       <input
         type="text"
-        value={task}
-        onChange={e => setTask(e.target.value)}
-        placeholder="Enter task"
-        className="border p-2 mr-2 mb-2 w-full"
+        placeholder="Task"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
       />
       <input
         type="datetime-local"
-        value={datetime}
-        onChange={e => setDatetime(e.target.value)}
-        className="border p-2 mb-4 w-full"
+        value={time}
+        onChange={(e) => setTime(e.target.value)}
       />
-      <button
-        onClick={addTodo}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-      >
-        Add Task
-      </button>
-      <ul className="mt-4">
+      <button onClick={handleAdd}>Add</button>
+
+      <ul>
         {todos.map(todo => (
-          <li key={todo.id} className="border-b p-2 flex justify-between items-center">
-            <div>
-              <strong>{todo.text}</strong> <br />
-              <small>{new Date(todo.time).toLocaleString()}</small>
-            </div>
-            <button onClick={() => deleteTodo(todo.id)} className="text-red-500">✕</button>
+          <li key={todo.id}>
+            {todo.text} — {new Date(todo.time).toLocaleString()}
+            <button onClick={() => handleDelete(todo.id)}>❌</button>
           </li>
         ))}
       </ul>
     </div>
   );
 }
+
+export default TodoApp;

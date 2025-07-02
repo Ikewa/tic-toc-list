@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-  "start": "node index.js",
-  "test": "jest"
-},
-"type": "module",
+    "start": "node index.js",
+    "test": "jest"
+  },
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
