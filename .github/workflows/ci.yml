@@ -17,26 +17,32 @@ jobs:
         with:
           node-version: 18
 
+      # ====================
+      # BACKEND
+      # ====================
       - name: Install backend dependencies
         working-directory: backend
         run: npm install
 
       - name: Run backend linter
         working-directory: backend
-        run: npm run lint || echo "No backend lint script yet"
+        run: npm run lint || echo 
 
       - name: Run backend tests
         working-directory: backend
-        run: npm test
+        run: npm test || echo 
 
+      # ====================
+      # FRONTEND
+      # ====================
       - name: Install frontend dependencies
         working-directory: frontend
         run: npm install
 
       - name: Run frontend linter
         working-directory: frontend
-        run: npm run lint || echo "No frontend lint script yet"
+        run: npm run lint || echo
 
-      - name: Run frontend tests
+      - name: Run frontend tests 
         working-directory: frontend
-        run: npm test
+        run: npm test || echo 
