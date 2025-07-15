@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import API from '../api'; // Axios instance we defined earlier
+import API from '../api';
+import './TodoApp.css'; // ✅ Corrected import for same-folder CSS
 
 function TodoApp() {
   const [todos, setTodos] = useState([]);
   const [text, setText] = useState('');
   const [time, setTime] = useState('');
 
-  // Fetch todos on load
   useEffect(() => {
     fetchTodos();
   }, []);
@@ -24,7 +24,7 @@ function TodoApp() {
     if (!text || !time) return alert('Please fill in all fields');
     try {
       await API.post('/todos', { text, time });
-      fetchTodos(); // Refresh list
+      fetchTodos();
       setText('');
       setTime('');
     } catch (err) {
@@ -35,34 +35,40 @@ function TodoApp() {
   const handleDelete = async (id) => {
     try {
       await API.delete(`/todos/${id}`);
-      fetchTodos(); // Refresh list
+      fetchTodos();
     } catch (err) {
       console.error('Error deleting todo:', err);
     }
   };
 
   return (
-    <div>
-      <h2>📝 To-Do List</h2>
+    <div className="todo-app">
+      <h2 className="todo-title">📝 To-Do List</h2>
 
-      <input
-        type="text"
-        placeholder="Task"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-      />
-      <input
-        type="datetime-local"
-        value={time}
-        onChange={(e) => setTime(e.target.value)}
-      />
-      <button onClick={handleAdd}>Add</button>
+      <div className="todo-form">
+        <input
+          className="todo-input"
+          type="text"
+          placeholder="Task"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        <input
+          className="todo-datetime"
+          type="datetime-local"
+          value={time}
+          onChange={(e) => setTime(e.target.value)}
+        />
+        <button className="todo-add-btn" onClick={handleAdd}>Add</button>
+      </div>
 
-      <ul>
+      <ul className="todo-list">
         {todos.map(todo => (
-          <li key={todo.id}>
-            {todo.text} — {new Date(todo.time).toLocaleString()}
-            <button onClick={() => handleDelete(todo.id)}>❌</button>
+          <li className="todo-item" key={todo.id}>
+            <span className="todo-text">
+              {todo.text} — {new Date(todo.time).toLocaleString()}
+            </span>
+            <button className="todo-delete-btn" onClick={() => handleDelete(todo.id)}>❌</button>
           </li>
         ))}
       </ul>

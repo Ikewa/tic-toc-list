@@ -7,7 +7,6 @@
     "start": "node index.js",
     "test": "jest"
   },
-  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -18,7 +17,7 @@
     "mysql2": "^3.14.1"
   },
   "devDependencies": {
-    "jest": "^30.0.3",
+    "jest": "^30.0.4",
     "supertest": "^7.1.1"
   }
 }
