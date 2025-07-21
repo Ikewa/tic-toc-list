@@ -1,0 +1,12 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+    image: tic-toc-list-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - HOST=0.0.0.0
