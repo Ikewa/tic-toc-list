@@ -1,12 +1,10 @@
-/* src/components/TodoApp.css */
-
 .todo-app {
   max-width: 600px;
   margin: 40px auto;
-  padding: 20px;
+  padding: 24px;
   background: #f8f9fa;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
   font-family: 'Segoe UI', sans-serif;
 }
 
@@ -21,24 +19,25 @@
   gap: 10px;
   justify-content: center;
   flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
 .todo-input,
 .todo-datetime {
-  padding: 8px;
+  padding: 10px;
   font-size: 16px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 6px;
   flex: 1 1 40%;
 }
 
 .todo-add-btn {
-  padding: 8px 16px;
+  padding: 10px 16px;
   background-color: #007bff;
   color: white;
   font-weight: bold;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
 }
 
@@ -49,30 +48,44 @@
 .todo-list {
   list-style: none;
   padding: 0;
-  margin-top: 20px;
+  margin: 0;
+}
+
+.todo-empty {
+  text-align: center;
+  color: #999;
+  font-style: italic;
 }
 
 .todo-item {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   background-color: #ffffff;
   border: 1px solid #ddd;
-  padding: 10px 12px;
+  padding: 10px 14px;
   margin-bottom: 10px;
-  border-radius: 4px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.todo-item:hover {
+  background-color: #f1f1f1;
 }
 
 .todo-text {
   flex-grow: 1;
+  text-align: left;
 }
 
 .todo-delete-btn {
   background-color: #dc3545;
   color: white;
   border: none;
-  padding: 4px 8px;
+  padding: 6px 10px;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .todo-delete-btn:hover {
