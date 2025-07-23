@@ -1,60 +1,83 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import API from '../api';
+import './TodoApp.css';
 
-export default function TodoApp() {
-  const [task, setTask] = useState('');
-  const [datetime, setDatetime] = useState('');
+const TodoApp = () => {
+  const [text, setText] = useState('');
+  const [time, setTime] = useState('');
   const [todos, setTodos] = useState([]);
 
-  const addTodo = () => {
-    if (task && datetime) {
-      const newTodo = {
-        id: Date.now(),
-        text: task,
-        time: datetime
-      };
-      setTodos([newTodo, ...todos]);
-      setTask('');
-      setDatetime('');
+  useEffect(() => {
+    fetchTodos();
+  }, []);
+
+  const fetchTodos = async () => {
+    try {
+      const res = await API.get('/todos');
+      setTodos(res.data);
+    } catch (err) {
+      console.error('Failed to load todos', err);
     }
   };
 
-  const deleteTodo = (id) => {
-    setTodos(todos.filter(todo => todo.id !== id));
+  const addTodo = async () => {
+    if (!text.trim() || !time.trim()) return;
+
+    try {
+      const res = await API.post('/todos', { task: text, time });
+      if (res.status === 201) {
+        fetchTodos();
+        setText('');
+        setTime('');
+      }
+    } catch (err) {
+      console.error('Failed to add todo', err);
+    }
+  };
+
+  const deleteTodo = async (id) => {
+    try {
+      await API.delete(`/todos/${id}`);
+      setTodos((prev) => prev.filter((todo) => todo.id !== id));
+    } catch (err) {
+      console.error('Failed to delete todo', err);
+    }
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto text-center">
-      <h1 className="text-2xl font-bold mb-4">To-Do List</h1>
-      <input
-        type="text"
-        value={task}
-        onChange={e => setTask(e.target.value)}
-        placeholder="Enter task"
-        className="border p-2 mr-2 mb-2 w-full"
-      />
-      <input
-        type="datetime-local"
-        value={datetime}
-        onChange={e => setDatetime(e.target.value)}
-        className="border p-2 mb-4 w-full"
-      />
-      <button
-        onClick={addTodo}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-      >
-        Add Task
-      </button>
-      <ul className="mt-4">
-        {todos.map(todo => (
-          <li key={todo.id} className="border-b p-2 flex justify-between items-center">
-            <div>
-              <strong>{todo.text}</strong> <br />
-              <small>{new Date(todo.time).toLocaleString()}</small>
-            </div>
-            <button onClick={() => deleteTodo(todo.id)} className="text-red-500">✕</button>
+    <div className="todo-app">
+      <h1>📝 My To-Do List</h1>
+
+      <div className="form">
+        <input
+          type="text"
+          placeholder="Enter task"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        <input
+          type="datetime-local"
+          value={time}
+          onChange={(e) => setTime(e.target.value)}
+        />
+        <button onClick={addTodo}>Add</button>
+      </div>
+
+      <ul className="todo-list">
+        {todos.map((todo) => (
+          <li key={todo.id}>
+            <span>{todo.task}</span>
+            <span className="todo-time">
+              {new Date(todo.time).toLocaleString()}
+            </span>
+            <button className="delete-btn" onClick={() => deleteTodo(todo.id)}>
+              ❌
+            </button>
           </li>
         ))}
       </ul>
     </div>
   );
-}
+};
+
+export default TodoApp;
