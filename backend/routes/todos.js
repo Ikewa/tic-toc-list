@@ -1,30 +1,37 @@
 const express = require('express');
 const { pool } = require('../db');
 
-const router = express.Router(); // ✅ This MUST come before router.get
+const router = express.Router();
 
-// GET /todos - fetch all tasks
 router.get('/', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM todos');
     res.json(rows);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Something went wrong' });
   }
 });
 
-// POST /todos - add new task
 router.post('/', async (req, res) => {
-  const { text, time } = req.body;
+  const { task, time } = req.body;
+
+  if (!task || !time) {
+    return res.status(400).json({ error: 'Task and time are required' });
+  }
+
   try {
-    await pool.query('INSERT INTO todos (text, time) VALUES (?, ?)', [text, time]);
-    res.status(201).json({ message: 'Todo added' });
+    const [result] = await pool.query(
+      'INSERT INTO todos (task, time) VALUES (?, ?)',
+      [task, time]
+    );
+    res.status(201).json({ id: result.insertId, task, time });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Failed to add todo' });
   }
 });
 
-// DELETE /todos/:id - delete task
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   try {
