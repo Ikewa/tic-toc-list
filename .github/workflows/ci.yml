@@ -25,9 +25,15 @@ jobs:
         working-directory: backend
         run: npm run lint || echo "No backend lint script yet"
 
-      - name: Run backend tests
+      - name: Debug Jest binary
         working-directory: backend
-        run: npm test
+        run: ls -la ./node_modules/.bin
+
+      - name: Run backend tests using direct path
+        working-directory: backend
+        run: |
+          chmod +x ./node_modules/.bin/jest
+          ./node_modules/.bin/jest
 
       - name: Install frontend dependencies
         working-directory: frontend
