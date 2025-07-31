@@ -32,6 +32,9 @@ jobs:
       - name:  Build Frontend Docker Image
         run: |
           docker build -t $REGISTRY_NAME/$FRONTEND_IMAGE:latest ./frontend
+          cd frontend
+          npm install
+          npm audit --audit-level-high
 
       - name:  Build Backend Docker Image
         run: |
@@ -56,3 +59,13 @@ jobs:
         with:
           app-name: your-backend-webapp-name
           images: ${{ env.REGISTRY_NAME }}/${{ env.BACKEND_IMAGE }}:latest
+      - name: Scan Docker image with Trivy
+        uses: aquasecurity/trivy-action@v0.14.0
+        with:
+          image-ref: todolistacr123.azurecr.io/tic-toc-list:latest
+          format: table
+          severity: CRITICAL,HIGH
+      - name: Fail on High/Critical Vulnerabilities
+        run: exit 1
+        if: failure() && steps.trivy.outcome == 'failure'
+
