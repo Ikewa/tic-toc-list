@@ -1,0 +1,58 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+
+env:
+  REGISTRY_NAME: todolistacr123.azurecr.io
+  FRONTEND_IMAGE: todo-lite-frontend
+  BACKEND_IMAGE: todo-lite-backend
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name:  Azure Container Registry Login
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.REGISTRY_NAME }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name:  Build Frontend Docker Image
+        run: |
+          docker build -t $REGISTRY_NAME/$FRONTEND_IMAGE:latest ./frontend
+
+      - name:  Build Backend Docker Image
+        run: |
+          docker build -t $REGISTRY_NAME/$BACKEND_IMAGE:latest ./backend
+
+      - name: Push Frontend Docker Image
+        run: |
+          docker push $REGISTRY_NAME/$FRONTEND_IMAGE:latest
+
+      - name: Push Backend Docker Image
+        run: |
+          docker push $REGISTRY_NAME/$BACKEND_IMAGE:latest
+
+      - name: Deploy to Azure (Frontend)
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: your-frontend-webapp-name
+          images: ${{ env.REGISTRY_NAME }}/${{ env.FRONTEND_IMAGE }}:latest
+
+      - name: Deploy to Azure (Backend)
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: your-backend-webapp-name
+          images: ${{ env.REGISTRY_NAME }}/${{ env.BACKEND_IMAGE }}:latest
