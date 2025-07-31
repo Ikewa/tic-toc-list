@@ -51,16 +51,16 @@ jobs:
       - name: Deploy to Azure (Frontend)
         uses: azure/webapps-deploy@v2
         with:
-          app-name: your-frontend-webapp-name
+          app-name: tic-toc-frontend
           images: ${{ env.REGISTRY_NAME }}/${{ env.FRONTEND_IMAGE }}:latest
 
       - name: Deploy to Azure (Backend)
         uses: azure/webapps-deploy@v2
         with:
-          app-name: your-backend-webapp-name
+          app-name: todolite-backend
           images: ${{ env.REGISTRY_NAME }}/${{ env.BACKEND_IMAGE }}:latest
       - name: Scan Docker image with Trivy
-        uses: aquasecurity/trivy-action@v0.14.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: todolistacr123.azurecr.io/tic-toc-list:latest
           format: table
