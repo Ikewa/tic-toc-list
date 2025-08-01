@@ -22,24 +22,36 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name:  Azure Container Registry Login
+      - name: Azure Container Registry Login
         uses: azure/docker-login@v1
         with:
           login-server: ${{ env.REGISTRY_NAME }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name:  Build Frontend Docker Image
+      # ---------- Frontend ----------
+      - name: Install & Audit Frontend Dependencies
+        working-directory: frontend
+        run: |
+          npm install
+          npm audit --audit-level=high
+
+      - name: Build Frontend Docker Image
         run: |
           docker build -t $REGISTRY_NAME/$FRONTEND_IMAGE:latest ./frontend
-          cd frontend
-          npm install
-          npm audit --audit-level-high
 
-      - name:  Build Backend Docker Image
+      # ---------- Backend ----------
+      - name: Install & Audit Backend Dependencies
+        working-directory: backend
+        run: |
+          npm install
+          npm audit --audit-level=high
+
+      - name: Build Backend Docker Image
         run: |
           docker build -t $REGISTRY_NAME/$BACKEND_IMAGE:latest ./backend
 
+      # ---------- Push Images ----------
       - name: Push Frontend Docker Image
         run: |
           docker push $REGISTRY_NAME/$FRONTEND_IMAGE:latest
@@ -48,6 +60,26 @@ jobs:
         run: |
           docker push $REGISTRY_NAME/$BACKEND_IMAGE:latest
 
+      # ---------- Security Scans ----------
+      - name: Scan Frontend Image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY_NAME }}/${{ env.FRONTEND_IMAGE }}:latest
+          format: table
+          severity: CRITICAL,HIGH
+
+      - name: Scan Backend Image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY_NAME }}/${{ env.BACKEND_IMAGE }}:latest
+          format: table
+          severity: CRITICAL,HIGH
+
+      - name: Fail if any scan fails
+        run: exit 1
+        if: failure()
+
+      # ---------- Deploy ----------
       - name: Deploy to Azure (Frontend)
         uses: azure/webapps-deploy@v2
         with:
@@ -59,13 +91,3 @@ jobs:
         with:
           app-name: todolite-backend
           images: ${{ env.REGISTRY_NAME }}/${{ env.BACKEND_IMAGE }}:latest
-      - name: Scan Docker image with Trivy
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: todolistacr123.azurecr.io/tic-toc-list:latest
-          format: table
-          severity: CRITICAL,HIGH
-      - name: Fail on High/Critical Vulnerabilities
-        run: exit 1
-        if: failure() && steps.trivy.outcome == 'failure'
-
