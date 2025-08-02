@@ -18,3 +18,12 @@ if (require.main === module) {
 
 module.exports = app;
 
+<<<<<<< HEAD
+=======
+if (require.main === module) {
+  app.listen(5000, () => {
+    console.log('Server running on http://localhost:5000');
+  });
+}
+
+>>>>>>> f8ad8b8aaace601d711ef9c6834443f7f33ebd8d

@@ -4,9 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+<<<<<<< HEAD
   "test": "echo \"Tests are disabled for now\" && exit 0",
   "release": "standard-version"
 },
+=======
+    "start": "node index.js",
+    "test": "npx jest"
+  },
+>>>>>>> f8ad8b8aaace601d711ef9c6834443f7f33ebd8d
   "keywords": [],
   "author": "",
   "license": "ISC",
