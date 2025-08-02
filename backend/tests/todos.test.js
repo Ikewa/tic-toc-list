@@ -8,3 +8,8 @@ describe('GET /todos', () => {
     expect(Array.isArray(res.body)).toBe(true);
   });
 });
+
+test('simple test works', () => {
+  expect(1 + 1).toBe(2);
+});
+
