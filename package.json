@@ -1,0 +1,16 @@
+{
+  "version": "1.0.1",
+  "dependencies": {
+    "morgan": "^1.10.1"
+  },
+  "devDependencies": {
+<<<<<<< HEAD
+    "jest": "^30.0.5",
+=======
+>>>>>>> f8ad8b8aaace601d711ef9c6834443f7f33ebd8d
+    "standard-version": "^9.5.0"
+  },
+  "scripts": {
+    "release": "standard-version"
+  }
+}
