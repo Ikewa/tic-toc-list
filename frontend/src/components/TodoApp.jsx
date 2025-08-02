@@ -60,7 +60,7 @@ const TodoApp = () => {
           value={time}
           onChange={(e) => setTime(e.target.value)}
         />
-        <button onClick={addTodo}>Add</button>
+        <button onClick={addTodo}>Add Task</button>
       </div>
 
       <ul className="todo-list">
