@@ -2,7 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - develop
 
 env:
   REGISTRY_NAME: todolistacr123.azurecr.io
@@ -29,7 +31,7 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      # ---------- Frontend ----------
+      # ----- FRONTEND -----
       - name: Install & Audit Frontend Dependencies
         working-directory: frontend
         run: |
@@ -40,7 +42,7 @@ jobs:
         run: |
           docker build -t $REGISTRY_NAME/$FRONTEND_IMAGE:latest ./frontend
 
-      # ---------- Backend ----------
+      # ----- BACKEND -----
       - name: Install & Audit Backend Dependencies
         working-directory: backend
         run: |
@@ -51,16 +53,14 @@ jobs:
         run: |
           docker build -t $REGISTRY_NAME/$BACKEND_IMAGE:latest ./backend
 
-      # ---------- Push Images ----------
+      # ----- PUSH IMAGES -----
       - name: Push Frontend Docker Image
-        run: |
-          docker push $REGISTRY_NAME/$FRONTEND_IMAGE:latest
+        run: docker push $REGISTRY_NAME/$FRONTEND_IMAGE:latest
 
       - name: Push Backend Docker Image
-        run: |
-          docker push $REGISTRY_NAME/$BACKEND_IMAGE:latest
+        run: docker push $REGISTRY_NAME/$BACKEND_IMAGE:latest
 
-      # ---------- Security Scans ----------
+      # ----- SECURITY SCANS -----
       - name: Scan Frontend Image with Trivy
         uses: aquasecurity/trivy-action@master
         with:
@@ -79,14 +79,30 @@ jobs:
         run: exit 1
         if: failure()
 
-      # ---------- Deploy ----------
-      - name: Deploy to Azure (Frontend)
+      # ----- CONDITIONAL DEPLOYMENT -----
+      - name: Deploy to Azure (Staging)
+        if: github.ref == 'refs/heads/develop'
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: tic-toc-frontend-staging
+          images: ${{ env.REGISTRY_NAME }}/${{ env.FRONTEND_IMAGE }}:latest
+
+      - name: Deploy to Azure (Staging Backend)
+        if: github.ref == 'refs/heads/develop'
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: todolite-backend-staging
+          images: ${{ env.REGISTRY_NAME }}/${{ env.BACKEND_IMAGE }}:latest
+
+      - name: Deploy to Azure (Production Frontend)
+        if: github.ref == 'refs/heads/main'
         uses: azure/webapps-deploy@v2
         with:
           app-name: tic-toc-frontend
           images: ${{ env.REGISTRY_NAME }}/${{ env.FRONTEND_IMAGE }}:latest
 
-      - name: Deploy to Azure (Backend)
+      - name: Deploy to Azure (Production Backend)
+        if: github.ref == 'refs/heads/main'
         uses: azure/webapps-deploy@v2
         with:
           app-name: todolite-backend
