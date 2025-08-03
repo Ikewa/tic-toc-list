@@ -68,3 +68,7 @@
 
 ## Live URL:
 https://tic-toc-frontend.azurewebsites.net/
+
+
+## Video link
+https://youtu.be/1gk6TkIBADY?si=5sbyGCy61jSerLpD
